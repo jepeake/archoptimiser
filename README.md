@@ -1,4 +1,4 @@
-# _Architectural Exploration_
+# _Architectural Optimisation_
 
 **_Exploring Microarchitectural Optimisation with SimpleScalar_**
 
