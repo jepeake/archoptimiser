@@ -1,0 +1,59 @@
+ #!/bin/bash
+
+# Optimal functional unit, branch predictor, and pipeline parameters
+optimal_ialu=2
+optimal_imult=1
+optimal_fpalu=4
+optimal_fpmult=1
+optimal_btb_sets=256
+optimal_btb_assoc=2
+optimal_ras=8
+optimal_ifqsize=8
+optimal_decodewidth=2
+optimal_issuewidth=2
+optimal_commitwidth=4
+
+# Optimal L1 data cache parameters
+optimal_dl1_nsets=64
+optimal_dl1_bsize=32
+optimal_dl1_assoc=1
+
+# Branch predictor
+bpredictor=comb
+
+# RUU and LSQ sizes
+ruu_size=16
+lsq_size=16
+
+# Vary L1 instruction cache configurations
+for il1_nsets in 64 128; do  # Number of sets
+  for il1_bsize in 32 64; do  # Block size
+    for il1_assoc in 1 2 4; do  # Associativity
+
+      # Print the current L1 instruction cache configuration
+      echo -n "Configuration: il1_nsets=$il1_nsets, il1_bsize=$il1_bsize, il1_assoc=$il1_assoc"
+
+      # Set simulation flags for the current L1 instruction cache configuration
+      export SSFLAGS="\
+      -fetch:ifqsize $optimal_ifqsize \
+      -decode:width $optimal_decodewidth \
+      -issue:width $optimal_issuewidth \
+      -commit:width $optimal_commitwidth \
+      -bpred $bpredictor \
+      -bpred:btb $optimal_btb_sets $optimal_btb_assoc \
+      -bpred:ras $optimal_ras \
+      -res:ialu $optimal_ialu \
+      -res:imult $optimal_imult \
+      -res:fpalu $optimal_fpalu \
+      -res:fpmult $optimal_fpmult \
+      -ruu:size $ruu_size \
+      -lsq:size $lsq_size \
+      -cache:dl1 dl1:$optimal_dl1_nsets:$optimal_dl1_bsize:$optimal_dl1_assoc:l \
+      -cache:il1 il1:$il1_nsets:$il1_bsize:$il1_assoc:l"
+
+      # Run the simulation with the current configuration
+      ./run-wattch 2>&1 | ./scripts/tabulate
+
+    done
+  done
+done

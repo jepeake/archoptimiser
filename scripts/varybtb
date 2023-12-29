@@ -1,0 +1,36 @@
+ #!/bin/bash
+
+# Optimal functional unit values
+optimal_ialu=2
+optimal_imult=1
+optimal_fpalu=4
+optimal_fpmult=1
+
+# Branch predictor
+bpredictor=comb
+
+# RUU and LSQ sizes
+ruu_size=16
+lsq_size=16
+
+# Loop over different configurations for BTB sets, BTB associativity, and RAS
+for btb_sets in 256 512; do
+  for btb_assoc in 2 4; do
+    for ras in 4 8; do
+
+      # Print the current configuration
+      echo -n "bpred,$bpredictor,ruu_size,$ruu_size,lsq_size,$lsq_size,res:ialu,$optimal_ialu,res:imult,$optimal_imult,res:fpalu,$optimal_fpalu,res:fpmult,$optimal_fpmult,btb_sets,$btb_sets,btb_assoc,$btb_assoc,ras,$ras"
+
+      # Set simulation flags
+      export SSFLAGS="-bpred $bpredictor -ruu:size $ruu_size -lsq:size $lsq_size -res:ialu $optimal_ialu -res:imult $optimal_imult -res:fpalu $optimal_fpalu -res:fpmult $optimal_fpmult -bpred:btb $btb_sets $btb_assoc -bpred:ras $ras"
+
+      # Run the simulation with the current configuration
+      ./run-wattch 2>&1 | ./scripts/tabulate
+
+    done
+  done
+done
+
+
+
+

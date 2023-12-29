@@ -1,0 +1,62 @@
+ #!/bin/bash
+
+# Loop over different configurations
+for ifqsize in 4 8; do
+  for decode_width in 2 4; do
+    for issue_width in 2 4; do
+      for inorder in false true; do
+        for commit_width in 2 4; do
+          for ruu_size in 16 32; do
+            for lsq_size in 8 16 32; do
+              for ialu in 2 4 8; do
+                for imult in 1 2; do
+                  for memport in 2 4; do
+                    for fpalu in 2 4; do
+                      for fpmult in 1 2; do
+                        for bpred in bimod comb 2lev comb; do
+                          for btb_sets in 256 512; do
+                            for btb_assoc in 2 4; do
+                              for ras in 4 8; do
+
+                                # Combine all flags
+                                export SSFLAGS="\
+                                -fetch:ifqsize $ifqsize \
+                                -decode:width $decode_width \
+                                -issue:width $issue_width \
+                                -issue:inorder $inorder \
+                                -commit:width $commit_width \
+                                -ruu:size $ruu_size \
+                                -lsq:size $lsq_size \
+                                -res:ialu $ialu \
+                                -res:imult $imult \
+                                -res:memport $memport \
+                                -res:fpalu $fpalu \
+                                -res:fpmult $fpmult \
+                                -bpred $bpred \
+                                -bpred:bimod 2048 \
+                                -bpred:2lev 1 1024 8 0 \
+                                -bpred:comb 1024 \
+                                -bpred:ras $ras \
+                                -bpred:btb $btb_sets $btb_assoc"
+
+                                # Print the current configuration
+                                echo -n "Configuration: IFQSize=$ifqsize, DecodeWidth=$decode_width, IssueWidth=$issue_width, InOrder=$inorder, CommitWidth=$commit_width, RUUSize=$ruu_size, LSQSize=$lsq_size, IALU=$ialu, IMult=$imult, MemPort=$memport, FPALU=$fpalu, FPMult=$fpmult, BPred=$bpred, BTBSets=$btb_sets, BTBAssoc=$btb_assoc, RAS=$ras"
+
+                                # Run the simulation with the current configuration
+                                ./run-wattch 2>&1 | ./scripts/tabulate
+                              done
+                            done
+                          done
+                        done
+                      done
+                    done
+                  done
+                done
+              done
+            done
+          done
+        done
+      done
+    done
+  done
+done

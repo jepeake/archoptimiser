@@ -1,0 +1,71 @@
+#!/bin/bash
+
+# Fixed optimal L2 data cache parameters
+fixed_ul2_dcache_nsets=256
+fixed_ul2_dcache_bsize=64
+fixed_ul2_dcache_assoc=4
+
+# Optimal functional unit, branch predictor, and pipeline parameters
+optimal_ialu=2
+optimal_imult=1
+optimal_fpalu=4
+optimal_fpmult=1
+optimal_btb_sets=256
+optimal_btb_assoc=2
+optimal_ras=8
+optimal_ifqsize=8
+optimal_decodewidth=2
+optimal_issuewidth=2
+optimal_commitwidth=4
+
+# Optimal L1 data cache parameters
+optimal_dl1_nsets=64
+optimal_dl1_bsize=32
+optimal_dl1_assoc=1
+
+# Optimal L1 instruction cache parameters
+optimal_il1_nsets=64
+optimal_il1_bsize=32
+optimal_il1_assoc=2
+
+# Branch predictor
+bpredictor=comb
+
+# RUU and LSQ sizes
+ruu_size=16
+lsq_size=16
+
+# Vary L2 instruction cache configurations
+for il2_nsets in 256 512; do  # Number of sets for L2 instruction cache
+  for il2_bsize in 64 128; do  # Block size for L2 instruction cache
+    for il2_assoc in 1 2 4; do  # Associativity for L2 instruction cache
+
+      # Print the current L2 instruction cache configuration
+      echo -n "L2 I-Cache Configuration: il2_nsets=$il2_nsets, il2_bsize=$il2_bsize, il2_assoc=$il2_assoc"
+
+      # Set simulation flags for the fixed L2 data cache and current L2 instruction cache configuration
+      export SSFLAGS="\
+      -fetch:ifqsize $optimal_ifqsize \
+      -decode:width $optimal_decodewidth \
+      -issue:width $optimal_issuewidth \
+      -commit:width $optimal_commitwidth \
+      -bpred $bpredictor \
+      -bpred:btb $optimal_btb_sets $optimal_btb_assoc \
+      -bpred:ras $optimal_ras \
+      -res:ialu $optimal_ialu \
+      -res:imult $optimal_imult \
+      -res:fpalu $optimal_fpalu \
+      -res:fpmult $optimal_fpmult \
+      -ruu:size $ruu_size \
+      -lsq:size $lsq_size \
+      -cache:dl1 dl1:$optimal_dl1_nsets:$optimal_dl1_bsize:$optimal_dl1_assoc:l \
+      -cache:il1 il1:$optimal_il1_nsets:$optimal_il1_bsize:$optimal_il1_assoc:l \
+      -cache:dl2 ul2:$fixed_ul2_dcache_nsets:$fixed_ul2_dcache_bsize:$fixed_ul2_dcache_assoc:l \
+      -cache:il2 il2:$il2_nsets:$il2_bsize:$il2_assoc:l"
+
+      # Run the simulation with the fixed L2 data cache and current L2 instruction cache configuration
+      ./run-wattch 2>&1 | ./scripts/tabulate
+
+    done
+  done
+done

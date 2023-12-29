@@ -1,0 +1,51 @@
+ #!/bin/bash
+
+# Optimal functional unit and branch predictor values
+optimal_ialu=2
+optimal_imult=1
+optimal_fpalu=4
+optimal_fpmult=1
+optimal_btb_sets=256
+optimal_btb_assoc=2
+optimal_ras=8
+
+# Optimal ifqsize, decodewidth, issuewidth, and commitwidth values
+optimal_ifqsize=8
+optimal_decodewidth=2
+optimal_issuewidth=2
+optimal_commitwidth=4
+
+# Branch predictor
+bpredictor=comb
+
+# RUU and LSQ sizes
+ruu_size=16
+lsq_size=16
+
+# Loop over the inorder parameter
+for inorder in false true; do
+
+  # Print the current configuration
+  echo -n "Configuration: ifqsize=$optimal_ifqsize, decodewidth=$optimal_decodewidth, issuewidth=$optimal_issuewidth, commitwidth=$optimal_commitwidth, inorder=$inorder, btb_sets=$optimal_btb_sets, btb_assoc=$optimal_btb_assoc, ras=$optimal_ras"
+
+  # Set simulation flags
+  export SSFLAGS="\
+  -fetch:ifqsize $optimal_ifqsize \
+  -decode:width $optimal_decodewidth \
+  -issue:width $optimal_issuewidth \
+  -commit:width $optimal_commitwidth \
+  -issue:inorder $inorder \
+  -bpred $bpredictor \
+  -bpred:btb $optimal_btb_sets $optimal_btb_assoc \
+  -bpred:ras $optimal_ras \
+  -res:ialu $optimal_ialu \
+  -res:imult $optimal_imult \
+  -res:fpalu $optimal_fpalu \
+  -res:fpmult $optimal_fpmult \
+  -ruu:size $ruu_size \
+  -lsq:size $lsq_size"
+
+  # Run the simulation with the current configuration
+  ./run-wattch 2>&1 | ./scripts/tabulate
+
+done

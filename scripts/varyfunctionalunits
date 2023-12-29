@@ -1,0 +1,26 @@
+ #!/bin/bash
+
+for ialu in 1 2 4 8; do
+  for imult in 1 2; do
+      for fpalu in 1 2 4; do
+        for fpmult in 1 2; do
+          for bpredictor in comb; do
+            for ruu_size in 16; do
+              for lsq_size in 16; do
+
+          echo -n "bpred,$bpredictor,ruu_size,$ruu_size,lsq_size,$lsq_size,res:ialu,$ialu,res:imult,$imult,res:fpalu,$fpalu,res:fpmult,$fpmult"
+         
+          export SSFLAGS="-bpred $bpredictor -ruu:size $ruu_size -lsq:size $lsq_size -res:ialu $ialu -res:imult $imult -res:fpalu $fpalu -res:fpmult $fpmult"
+         
+          ./run-wattch 2>&1 | ./scripts/tabulate
+              done
+            done
+          done
+        done
+      done
+    done
+  done
+
+
+
+

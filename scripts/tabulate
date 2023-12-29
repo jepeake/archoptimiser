@@ -1,0 +1,9 @@
+awk '/sim_IPC/ {printf(",sim_IPC,%s",$2)};\
+/ruu_full/ {printf(",ruu_full,%s", $2)};\
+/lsq_full/ {printf(",lsq_full,%s", $2)};\
+/avg_sim_slip/ {printf(",avg_sim_slip,%s", $2)};\
+/sim_exec_BW/ {printf(",sim_exec_BW,%s", $2)};\
+/dl1.miss_rate/ {printf(",dl1.miss_rate,%s", $2)};\
+/ul2.miss_rate/ {printf(",ul2.miss_rate,%s", $2)};\
+/# total power per cycle_cc1/ {printf(",total_power_cycle_cc1,%s\n", $2)};\
+'

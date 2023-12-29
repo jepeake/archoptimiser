@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Usage: varycachesize 256 8192 for powers of two from 256 to 8192 inclusive
+
+for ((cache_size = $1; cache_size <= $2; cache_size *= 2))
+do
+  echo -n "D1_cache_size,$cache_size"
+  export SSFLAGS="-cache:dl1 dl1:$cache_size:32:1:l"
+  ./run-wattch 2>&1 | awk '/dl1.miss_rate/ {printf(",dl1.miss_rate,%s\n",$2)};\'
+done

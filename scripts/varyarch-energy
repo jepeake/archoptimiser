@@ -1,0 +1,8 @@
+#!/bin/bash
+
+for ruu_size in 16
+do
+  echo -n "ruu_size,$ruu_size"
+  export SSFLAGS="-ruu:size $ruu_size"
+  ./run-wattch 2>&1 | ./scripts/tabulate
+done

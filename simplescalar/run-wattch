@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# This shell script runs the test program on a small problem size
+# - small enough for you to run a lot of experiments
+
+NINS=100000
+NQS=$NINS
+SIZE=$NINS
+DELTA=3
+
+/homes/phjk/simplesim-wattch/sim-outorder $SSFLAGS ./splaytest.ss 3 $NINS $NQS $SIZE $DELTA
