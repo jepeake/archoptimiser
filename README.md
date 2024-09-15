@@ -1,4 +1,4 @@
-# _picowatt_
+# _archoptimiser_
 
 _This repository contains .sh scripts to explore microarchitectural configrations of an OoO Issue Processor._
 
